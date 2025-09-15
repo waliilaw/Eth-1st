@@ -1,24 +1,23 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { Contract } from "ethers";
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers.js";
-import { beforeEach, describe, it } from "node:test";
+import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 
 describe("Lottery", function () {
     let lottery: Contract;
     let owner: SignerWithAddress;
     let addr1: SignerWithAddress;
     let addr2: SignerWithAddress;
-    const entryFee = ethers.utils.parseEther("0.1");
+    const entryFee = ethers.parseEther("0.1"); // ethers v6
 
     beforeEach(async function () {
-        // get accounrts
+        // get accounts
         [owner, addr1, addr2] = await ethers.getSigners();
-        
-        // deploy the thing 
+
+        // deploy contract
         const Lottery = await ethers.getContractFactory("Lottery");
         lottery = await Lottery.deploy();
-        await lottery.deployed();
+        await lottery.waitForDeployment(); // ethers v6
     });
 
     describe("Deployment", function () {
@@ -41,7 +40,7 @@ describe("Lottery", function () {
         it("Should reject entries with incorrect fee", async function () {
             await expect(
                 lottery.connect(addr1).enter({ 
-                    value: ethers.utils.parseEther("0.05") 
+                    value: ethers.parseEther("0.05") 
                 })
             ).to.be.revertedWith("Entry Fee is 0.1 ETH");
         });
